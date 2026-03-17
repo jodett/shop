@@ -1,0 +1,40 @@
+{{- if .Values.startupJob.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "shopware-k3s.fullname" . }}-startup
+  labels:
+    {{- include "shopware-k3s.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: {{ .Values.startupJob.backoffLimit }}
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: startup
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              php bin/console system:install --basic-setup --drop-database --force || true
+              php bin/console cache:clear
+              php bin/console database:migrate --all || true
+          envFrom:
+            - secretRef:
+                name: {{ include "shopware-k3s.fullname" . }}-env
+          volumeMounts:
+            - name: media
+              mountPath: /var/www/html/public/media
+            - name: media
+              mountPath: /var/www/html/files
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: {{ default (printf "%s-media" (include "shopware-k3s.fullname" .)) .Values.persistence.media.existingClaim }}
+{{- end }}

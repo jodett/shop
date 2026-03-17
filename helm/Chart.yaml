@@ -1,0 +1,17 @@
+apiVersion: v2
+name: shopware-k3s
+description: Production-oriented Shopware chart for k3s with external MariaDB/Redis and Longhorn-backed media storage
+type: application
+version: 0.1.0
+appVersion: "6.6"
+keywords:
+  - shopware
+  - ecommerce
+  - k3s
+  - traefik
+  - longhorn
+home: https://developer.shopware.com/
+sources:
+  - https://developer.shopware.com/docs/guides/hosting/installation-updates/docker.html
+maintainers:
+  - name: OpenAI

@@ -1,0 +1,50 @@
+{{- if .Values.shopware.worker.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "shopware-k3s.fullname" . }}-worker
+  labels:
+    {{- include "shopware-k3s.labels" . | nindent 4 }}
+    app.kubernetes.io/component: worker
+spec:
+  replicas: {{ .Values.shopware.worker.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "shopware-k3s.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: worker
+  template:
+    metadata:
+      labels:
+        {{- include "shopware-k3s.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: worker
+    spec:
+      serviceAccountName: {{ include "shopware-k3s.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: worker
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          command: ["bin/console", "messenger:consume", "async", "low_priority", "failed", "--time-limit=3600", "--memory-limit=512M", "--no-interaction"]
+          envFrom:
+            - secretRef:
+                name: {{ include "shopware-k3s.fullname" . }}-env
+          env:
+            - name: APP_DEBUG
+              value: "0"
+            - name: TRUSTED_PROXIES
+              value: {{ .Values.shopware.trustedProxies | quote }}
+          volumeMounts:
+            - name: media
+              mountPath: /var/www/html/public/media
+            - name: media
+              mountPath: /var/www/html/files
+          resources:
+            {{- toYaml .Values.worker.resources | nindent 12 }}
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: {{ default (printf "%s-media" (include "shopware-k3s.fullname" .)) .Values.persistence.media.existingClaim }}
+{{- end }}

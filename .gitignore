@@ -1,0 +1,18 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Helm
+*.tgz
+charts/*.tgz
+
+# Local overrides (do not commit)
+helm/values.local.yaml
+
+# Secrets / env (if any)
+.env
+.env.*
+*.pem

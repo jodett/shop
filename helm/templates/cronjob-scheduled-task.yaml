@@ -1,0 +1,46 @@
+{{- if .Values.shopware.cron.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "shopware-k3s.fullname" . }}-scheduled-task
+  labels:
+    {{- include "shopware-k3s.labels" . | nindent 4 }}
+    app.kubernetes.io/component: cron
+spec:
+  schedule: {{ .Values.shopware.cron.schedule | quote }}
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "shopware-k3s.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: cron
+        spec:
+          restartPolicy: Never
+          serviceAccountName: {{ include "shopware-k3s.serviceAccountName" . }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          containers:
+            - name: scheduled-task
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              command: ["bin/console", "scheduled-task:run", "--no-interaction"]
+              envFrom:
+                - secretRef:
+                    name: {{ include "shopware-k3s.fullname" . }}-env
+              volumeMounts:
+                - name: media
+                  mountPath: /var/www/html/public/media
+                - name: media
+                  mountPath: /var/www/html/files
+              resources:
+                {{- toYaml .Values.cron.resources | nindent 16 }}
+          volumes:
+            - name: media
+              persistentVolumeClaim:
+                claimName: {{ default (printf "%s-media" (include "shopware-k3s.fullname" .)) .Values.persistence.media.existingClaim }}
+{{- end }}

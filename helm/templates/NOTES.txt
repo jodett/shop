@@ -1,0 +1,17 @@
+1. Set your custom runtime image in values.yaml:
+   {{ .Values.image.repository }}:{{ .Values.image.tag }}
+
+2. Confirm the image contains:
+   - your Shopware project under /var/www/html
+   - PHP-FPM
+   - bin/console
+
+3. Create or point to MariaDB and Redis before installation.
+
+4. Install with:
+   helm upgrade --install {{ .Release.Name }} . -n <namespace> --create-namespace
+
+5. Open:
+   {{- range .Values.ingress.hosts }}
+   https://{{ .host }}
+   {{- end }}
