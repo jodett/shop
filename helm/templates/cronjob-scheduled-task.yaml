@@ -8,8 +8,9 @@ metadata:
     app.kubernetes.io/component: cron
 spec:
   schedule: {{ .Values.shopware.cron.schedule | quote }}
+  concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
-  failedJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 2
   jobTemplate:
     spec:
       template:
@@ -40,7 +41,12 @@ spec:
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               securityContext:
                 {{- toYaml .Values.securityContext | nindent 16 }}
-              command: ["php", "/var/www/html/bin/console", "scheduled-task:run", "--no-interaction"]
+              command:
+                - php
+                - /var/www/html/bin/console
+                - scheduled-task:run
+                - --no-wait
+                - --no-interaction
               envFrom:
                 - secretRef:
                     name: {{ include "shopware-k3s.fullname" . }}-env

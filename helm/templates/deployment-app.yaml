@@ -44,6 +44,10 @@ spec:
               value: {{ .Values.shopware.trustedProxies | quote }}
             - name: PHP_MEMORY_LIMIT
               value: "1G"
+            - name: SYMFONY_TRUSTED_PROXIES
+              value: {{ .Values.shopware.trustedProxies | quote }}
+            - name: SYMFONY_TRUSTED_HEADERS
+              value: "x-forwarded-for,x-forwarded-host,x-forwarded-proto,x-forwarded-port"
           ports:
             - name: http
               containerPort: {{ .Values.app.service.port }}
@@ -53,21 +57,33 @@ spec:
               mountPath: /var/www/html/public/media
             - name: media
               mountPath: /var/www/html/files
+
+          startupProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+
           {{- if .Values.app.readinessProbe.enabled }}
           readinessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: http
             initialDelaySeconds: 20
             periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 12
           {{- end }}
+
           {{- if .Values.app.livenessProbe.enabled }}
           livenessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: http
-            initialDelaySeconds: 60
+            initialDelaySeconds: 90
             periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 6
           {{- end }}
           resources:
             {{- toYaml .Values.app.resources | nindent 12 }}

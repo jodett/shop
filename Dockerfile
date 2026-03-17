@@ -30,6 +30,10 @@ WORKDIR /build
 RUN composer create-project shopware/production:${SHOPWARE_VERSION} . --no-interaction --no-scripts
 RUN composer require shopware/docker --no-interaction --no-scripts
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+RUN php -d memory_limit=1G /build/bin/console bundle:dump \
+ && php -d memory_limit=1G /build/bin/console feature:dump \
+ && php -d memory_limit=1G /build/bin/console assets:install
+ 
 RUN test -f /build/bin/console
 
 FROM ghcr.io/shopware/docker-base:${PHP_VERSION}-frankenphp AS runtime

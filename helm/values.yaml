@@ -3,7 +3,7 @@ fullnameOverride: ""
 
 image:
   repository: ghcr.io/jodett/shopware
-  tag: "0.1.6"
+  tag: "0.1.7"
   pullPolicy: IfNotPresent
   pullSecrets: []
 
@@ -40,26 +40,10 @@ securityContext:
   runAsUser: 33
   runAsGroup: 33
 
-nginx:
-  image:
-    repository: nginx
-    tag: "1.27-alpine"
-    pullPolicy: IfNotPresent
-  service:
-    type: ClusterIP
-    port: 80
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 500m
-      memory: 256Mi
-
 app:
   service:
     type: ClusterIP
-    port: 9000
+    port: 8000
   resources:
     requests:
       cpu: 500m
