@@ -22,9 +22,10 @@ spec:
             - -c
             - |
               set -e
-              php bin/console system:install --basic-setup --drop-database --force || true
+              php bin/console system:install --basic-setup --create-database --force || true
+              php bin/console database:migrate --all
+              php bin/console assets:install || true
               php bin/console cache:clear
-              php bin/console database:migrate --all || true
           envFrom:
             - secretRef:
                 name: {{ include "shopware-k3s.fullname" . }}-env

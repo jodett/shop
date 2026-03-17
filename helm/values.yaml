@@ -1,9 +1,5 @@
-image:
-  repository: ghcr.io/joachimdettbarn/shopware-runtime
-  tag: "6.6.8-custom"
-
 shopware:
-  appUrl: https://shop.cloud.dettbarn.org
+  appUrl: https://shop.example.org
   appSecret: "CHANGE_ME_TO_A_LONG_RANDOM_VALUE"
   instanceId: "CHANGE_ME_TO_A_UUID"
   mailerDsn: "smtp://user:pass@smtp.example.tld:587?encryption=tls&auth_mode=login"
@@ -31,26 +27,26 @@ ingress:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-cluster-issuer-prod
   hosts:
-    - host: shop.cloud.dettbarn.org
+    - host: shop.example.org
       paths:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: shop-cloud-dettbarn-org-tls
+    - secretName: shop-example-org-tls
       hosts:
-        - shop.cloud.dettbarn.org
+        - shop.example.org
 nameOverride: ""
 fullnameOverride: ""
 
 image:
-  repository: ghcr.io/example/shopware-runtime
-  tag: "6.6-custom"
+  repository: ghcr.io/jodett/shopware
+  tag: "0.1.1"
   pullPolicy: IfNotPresent
   pullSecrets: []
 
 shopware:
   appEnv: prod
-  appUrl: https://shop.cloud.dettbarn.org
+  appUrl: https://shop.example.org
   appSecret: "CHANGE_ME_TO_A_LONG_RANDOM_VALUE"
   instanceId: "CHANGE_ME_TO_A_UUID"
   trustedProxies: "127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
@@ -155,16 +151,16 @@ ingress:
   enabled: true
   className: traefik
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-cluster-issuer-prod
   hosts:
-    - host: shop.cloud.dettbarn.org
+    - host: shop.example.org
       paths:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: shop-cloud-dettbarn-org-tls
+    - secretName: shop-example-org-tls
       hosts:
-        - shop.cloud.dettbarn.org
+        - shop.example.org
 
 resources: {}
 nodeSelector: {}

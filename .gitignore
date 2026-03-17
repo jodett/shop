@@ -16,3 +16,6 @@ helm/values.local.yaml
 .env
 .env.*
 *.pem
+
+# other
+shopware/

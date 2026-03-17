@@ -32,12 +32,20 @@ RUN composer require shopware/docker --no-interaction
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-FROM ghcr.io/shopware/docker-base:${PHP_VERSION}-frankenphp AS runtime
+FROM ghcr.io/shopware/docker-base:${PHP_VERSION}-caddy AS runtime
 
 WORKDIR /var/www/html
-COPY --from=builder /build /var/www/html
 
-RUN mkdir -p var public/media public/thumbnail public/sitemap \
- && chown -R www-data:www-data /var/www/html
+USER root
+
+COPY --from=builder --chown=82:82 /build /var/www/html
+
+RUN mkdir -p \
+    /var/www/html/files \
+    /var/www/html/public/theme \
+    /var/www/html/public/media \
+    /var/www/html/public/thumbnail \
+    /var/www/html/public/sitemap \
+ && chown -R 82:82 /var/www/html
 
 USER www-data
