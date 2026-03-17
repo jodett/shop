@@ -22,10 +22,10 @@ spec:
             - -c
             - |
               set -e
-              php /var/www/html/bin/console system:install --basic-setup --create-database --force || true
-              php /var/www/html/bin/console database:migrate --all
-              php /var/www/html/bin/console assets:install || true
-              php /var/www/html/bin/console cache:clear
+              php -d memory_limit=1G /var/www/html/bin/console system:install --basic-setup --create-database --force || true
+              php -d memory_limit=1G /var/www/html/bin/console database:migrate --all
+              php -d memory_limit=1G /var/www/html/bin/console assets:install || true
+              php -d memory_limit=1G /var/www/html/bin/console cache:clear
           envFrom:
             - secretRef:
                 name: {{ include "shopware-k3s.fullname" . }}-env

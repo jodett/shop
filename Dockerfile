@@ -53,6 +53,8 @@ RUN apt-get update && apt-get install -y \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
+ RUN echo "memory_limit=1G" > /usr/local/etc/php/conf.d/zz-memory-limit.ini
+
 WORKDIR /var/www/html
 
 COPY --from=builder --chown=82:82 /build/ /var/www/html/

@@ -3,7 +3,7 @@ fullnameOverride: ""
 
 image:
   repository: ghcr.io/jodett/shopware
-  tag: "0.1.4"
+  tag: "0.1.5"
   pullPolicy: IfNotPresent
   pullSecrets: []
 
