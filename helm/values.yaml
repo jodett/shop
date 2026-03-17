@@ -1,46 +1,9 @@
-shopware:
-  appUrl: https://shop.example.org
-  appSecret: "CHANGE_ME_TO_A_LONG_RANDOM_VALUE"
-  instanceId: "CHANGE_ME_TO_A_UUID"
-  mailerDsn: "smtp://user:pass@smtp.example.tld:587?encryption=tls&auth_mode=login"
-
-mariadb:
-  host: mariadb.shop.svc.cluster.local
-  port: 3306
-  database: shopware
-  user: shopware
-  password: "CHANGE_ME"
-
-redis:
-  enabled: true
-  url: redis://redis-master.shop.svc.cluster.local:6379/0
-
-persistence:
-  media:
-    storageClass: longhorn-retain
-    accessModes:
-      - ReadWriteMany
-    size: 20Gi
-
-ingress:
-  className: traefik
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-cluster-issuer-prod
-  hosts:
-    - host: shop.example.org
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - secretName: shop-example-org-tls
-      hosts:
-        - shop.example.org
 nameOverride: ""
 fullnameOverride: ""
 
 image:
   repository: ghcr.io/jodett/shopware
-  tag: "0.1.1"
+  tag: "0.1.4"
   pullPolicy: IfNotPresent
   pullSecrets: []
 
@@ -137,15 +100,29 @@ persistence:
     size: 30Gi
 
 mariadb:
-  host: mariadb.shop.svc.cluster.local
+  # If enabled, this chart deploys an in-cluster MariaDB (StatefulSet + PVC + Service)
+  enabled: false
+  image:
+    repository: mariadb
+    tag: "11.4"
+    pullPolicy: IfNotPresent
+  # Used by the app. When mariadb.enabled=true, host is ignored and becomes "<release>-<chart>-mariadb".
+  host: mariadb.default.cluster.local
   port: 3306
   database: shopware
   user: shopware
   password: "CHANGE_ME"
+  rootPassword: "CHANGE_ME_ROOT"
+  persistence:
+    enabled: true
+    storageClass: longhorn
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
 
 redis:
   enabled: true
-  url: redis://redis-master.shop.svc.cluster.local:6379/0
+  url: redis://redis-master.default.cluster.local:6379/0
 
 ingress:
   enabled: true

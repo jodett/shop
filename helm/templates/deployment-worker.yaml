@@ -27,7 +27,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          command: ["bin/console", "messenger:consume", "async", "low_priority", "failed", "--time-limit=3600", "--memory-limit=512M", "--no-interaction"]
+          command: ["php", "/var/www/html/bin/console", "messenger:consume", "async", "low_priority", "failed", "--time-limit=3600", "--memory-limit=512M", "--no-interaction"]
           envFrom:
             - secretRef:
                 name: {{ include "shopware-k3s.fullname" . }}-env

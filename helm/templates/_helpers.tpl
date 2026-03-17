@@ -32,5 +32,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "shopware-k3s.databaseUrl" -}}
-{{- printf "mysql://%s:%s@%s:%v/%s" .Values.mariadb.user .Values.mariadb.password .Values.mariadb.host (.Values.mariadb.port | int) .Values.mariadb.database -}}
+{{- $host := .Values.mariadb.host -}}
+{{- if .Values.mariadb.enabled -}}
+{{- $host = printf "%s-mariadb" (include "shopware-k3s.fullname" .) -}}
+{{- end -}}
+{{- printf "mysql://%s:%s@%s:%v/%s" .Values.mariadb.user .Values.mariadb.password $host (.Values.mariadb.port | int) .Values.mariadb.database -}}
 {{- end -}}

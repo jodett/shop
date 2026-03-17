@@ -28,7 +28,7 @@ spec:
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               securityContext:
                 {{- toYaml .Values.securityContext | nindent 16 }}
-              command: ["bin/console", "scheduled-task:run", "--no-interaction"]
+              command: ["php", "/var/www/html/bin/console", "scheduled-task:run", "--no-interaction"]
               envFrom:
                 - secretRef:
                     name: {{ include "shopware-k3s.fullname" . }}-env

@@ -7,6 +7,7 @@
    - bin/console
 
 3. Create or point to MariaDB and Redis before installation.
+   - MariaDB: set `mariadb.enabled=true` to deploy one, or set `mariadb.host` to an existing DB service.
 
 4. Install with:
    helm upgrade --install {{ .Release.Name }} . -n <namespace> --create-namespace

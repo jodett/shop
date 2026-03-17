@@ -1,0 +1,57 @@
+{{- if .Values.mariadb.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "shopware-k3s.fullname" . }}-mariadb
+  labels:
+    {{- include "shopware-k3s.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mariadb
+spec:
+  serviceName: {{ include "shopware-k3s.fullname" . }}-mariadb
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "shopware-k3s.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: mariadb
+  template:
+    metadata:
+      labels:
+        {{- include "shopware-k3s.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: mariadb
+    spec:
+      securityContext:
+        fsGroup: 999
+      containers:
+        - name: mariadb
+          image: "{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}"
+          imagePullPolicy: {{ .Values.mariadb.image.pullPolicy }}
+          ports:
+            - name: mysql
+              containerPort: 3306
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: {{ include "shopware-k3s.fullname" . }}-mariadb
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+      {{- if not .Values.mariadb.persistence.enabled }}
+      volumes:
+        - name: data
+          emptyDir: {}
+      {{- end }}
+  {{- if .Values.mariadb.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          {{- toYaml .Values.mariadb.persistence.accessModes | nindent 10 }}
+        resources:
+          requests:
+            storage: {{ .Values.mariadb.persistence.size | quote }}
+        {{- if .Values.mariadb.persistence.storageClass }}
+        storageClassName: {{ .Values.mariadb.persistence.storageClass | quote }}
+        {{- end }}
+  {{- end }}
+{{- end }}
