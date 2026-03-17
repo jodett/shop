@@ -30,43 +30,15 @@ WORKDIR /build
 RUN composer create-project shopware/production:${SHOPWARE_VERSION} . --no-interaction --no-scripts
 RUN composer require shopware/docker --no-interaction --no-scripts
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
-
-# HARTE PRÜFUNG
 RUN test -f /build/bin/console
-RUN ls -la /build
-RUN ls -la /build/bin
 
-FROM php:${PHP_VERSION}-fpm AS runtime
+FROM ghcr.io/shopware/docker-base:${PHP_VERSION}-frankenphp AS runtime
 
-RUN apt-get update && apt-get install -y \
-    libzip-dev \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    libicu-dev \
-    libonig-dev \
-    libxml2-dev \
-    libcurl4-openssl-dev \
-    libbz2-dev \
- && docker-php-ext-configure gd --with-freetype --with-jpeg \
- && docker-php-ext-install gd intl pdo_mysql zip bz2 mbstring xml \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
-
- RUN echo "memory_limit=1G" > /usr/local/etc/php/conf.d/zz-memory-limit.ini
-
+ENV PHP_MEMORY_LIMIT=1G
 WORKDIR /var/www/html
 
-COPY --from=builder --chown=82:82 /build/ /var/www/html/
-
-RUN test -f /var/www/html/bin/console
-
-RUN mkdir -p \
-    /var/www/html/files \
-    /var/www/html/public/theme \
-    /var/www/html/public/media \
-    /var/www/html/public/thumbnail \
-    /var/www/html/public/sitemap \
+USER root
+COPY --from=builder --chown=82:82 /build /var/www/html
+RUN test -f /var/www/html/bin/console \
  && chown -R 82:82 /var/www/html
-
-USER 82:82
+USER www-data

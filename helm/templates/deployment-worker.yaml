@@ -21,6 +21,18 @@ spec:
       serviceAccountName: {{ include "shopware-k3s.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.startupJob.enabled }}
+      initContainers:
+        - name: wait-for-startup
+          image: {{ .Values.startupJob.waitImage | quote }}
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for startup job {{ include "shopware-k3s.fullname" . }}-startup..."
+              kubectl wait --for=condition=complete job/{{ include "shopware-k3s.fullname" . }}-startup -n {{ .Release.Namespace }} --timeout={{ .Values.startupJob.waitTimeout }}s
+              echo "Startup job completed."
+      {{- end }}
       containers:
         - name: worker
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

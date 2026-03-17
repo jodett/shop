@@ -3,7 +3,7 @@ fullnameOverride: ""
 
 image:
   repository: ghcr.io/jodett/shopware
-  tag: "0.1.5"
+  tag: "0.1.6"
   pullPolicy: IfNotPresent
   pullSecrets: []
 
@@ -150,6 +150,9 @@ networkPolicy:
 startupJob:
   enabled: false
   backoffLimit: 1
+  # Worker and cron wait for this job before starting (initContainer)
+  waitTimeout: 600
+  waitImage: bitnami/kubectl:latest
 
 backup:
   mariadbDumpExample:

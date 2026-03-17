@@ -24,13 +24,16 @@ spec:
       serviceAccountName: {{ include "shopware-k3s.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: shopware-app
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          command: ["php-fpm", "-F"]
           envFrom:
             - secretRef:
                 name: {{ include "shopware-k3s.fullname" . }}-env
@@ -40,15 +43,10 @@ spec:
             - name: TRUSTED_PROXIES
               value: {{ .Values.shopware.trustedProxies | quote }}
             - name: PHP_MEMORY_LIMIT
-              value: {{ .Values.shopware.phpMemoryLimit | quote }}
-            - name: PHP_UPLOAD_LIMIT
-              value: {{ .Values.shopware.phpUploadLimit | quote }}
-          {{- with .Values.shopware.extraEnv }}
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+              value: "1G"
           ports:
-            - name: fpm
-              containerPort: 9000
+            - name: http
+              containerPort: {{ .Values.app.service.port }}
               protocol: TCP
           volumeMounts:
             - name: media
@@ -57,16 +55,18 @@ spec:
               mountPath: /var/www/html/files
           {{- if .Values.app.readinessProbe.enabled }}
           readinessProbe:
-            tcpSocket:
-              port: fpm
+            httpGet:
+              path: /
+              port: http
             initialDelaySeconds: 20
             periodSeconds: 10
           {{- end }}
           {{- if .Values.app.livenessProbe.enabled }}
           livenessProbe:
-            tcpSocket:
-              port: fpm
-            initialDelaySeconds: 30
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 60
             periodSeconds: 20
           {{- end }}
           resources:
@@ -75,10 +75,6 @@ spec:
         - name: media
           persistentVolumeClaim:
             claimName: {{ default (printf "%s-media" (include "shopware-k3s.fullname" .)) .Values.persistence.media.existingClaim }}
-      {{- with .Values.image.pullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

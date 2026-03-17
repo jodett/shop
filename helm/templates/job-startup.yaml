@@ -5,9 +5,7 @@ metadata:
   name: {{ include "shopware-k3s.fullname" . }}-startup
   labels:
     {{- include "shopware-k3s.labels" . | nindent 4 }}
-  annotations:
-    "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  # No helm hook: job is created with the release so worker/cron initContainers can wait for it
 spec:
   backoffLimit: {{ .Values.startupJob.backoffLimit }}
   template:

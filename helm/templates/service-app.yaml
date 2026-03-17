@@ -11,7 +11,7 @@ spec:
     {{- include "shopware-k3s.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: app
   ports:
-    - name: fpm
+    - name: http
       port: {{ .Values.app.service.port }}
-      targetPort: fpm
+      targetPort: http
       protocol: TCP

@@ -33,9 +33,9 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
-                name: {{ include "shopware-k3s.fullname" $ }}-nginx
+                name: {{ include "shopware-k3s.fullname" $ }}-app
                 port:
-                  number: {{ $.Values.nginx.service.port }}
+                  number: {{ $.Values.app.service.port }}
           {{- end }}
     {{- end }}
 {{- end }}
