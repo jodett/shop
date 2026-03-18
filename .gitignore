@@ -19,3 +19,7 @@ helm/values.local.yaml
 
 # other
 shopware/
+
+# .NET
+**/bin/
+**/obj/
