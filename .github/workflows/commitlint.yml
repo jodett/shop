@@ -18,8 +18,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Lint commit messages (Conventional Commits)
+      - name: Lint commit messages (PR range)
+        if: github.event_name == 'pull_request'
         uses: wagoid/commitlint-github-action@v6
         with:
           configFile: commitlint.config.cjs
+
+      - name: Lint commit messages (push - HEAD only)
+        if: github.event_name == 'push'
+        uses: wagoid/commitlint-github-action@v6
+        with:
+          configFile: commitlint.config.cjs
+          commitDepth: 1
 
