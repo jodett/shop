@@ -42,13 +42,24 @@ spec:
               value: {{ .Values.ebayAdapter.apiBaseUrl | quote }}
             - name: EBAY_POLL_INTERVAL_SECONDS
               value: {{ .Values.ebayAdapter.pollIntervalSeconds | quote }}
+            - name: EBAY_DRY_RUN
+              value: {{ .Values.ebayAdapter.dryRun | quote }}
+            - name: EBAY_OAUTH_SCOPES
+              value: {{ .Values.ebayAdapter.oauthScopes | quote }}
             {{- if .Values.ebayAdapter.shopwareAdminApiBaseUrl }}
             - name: SHOPWARE_ADMIN_API_BASE_URL
               value: {{ .Values.ebayAdapter.shopwareAdminApiBaseUrl | quote }}
             {{- end }}
+            - name: SHOPWARE_EBAY_TAG
+              value: {{ .Values.ebayAdapter.shopwareEbayTag | quote }}
+            - name: STATE_DB_PATH
+              value: {{ .Values.ebayAdapter.stateDbPath | quote }}
           envFrom:
             - secretRef:
                 name: {{ include "shopware-k3s.fullname" . }}-ebay-adapter
+          volumeMounts:
+            - name: state
+              mountPath: /data
           securityContext:
             runAsNonRoot: true
             runAsUser: 65532
@@ -57,5 +68,8 @@ spec:
             readOnlyRootFilesystem: true
           resources:
             {{- toYaml .Values.ebayAdapter.resources | nindent 12 }}
+      volumes:
+        - name: state
+          emptyDir: {}
 {{- end }}
 

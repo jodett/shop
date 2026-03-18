@@ -150,6 +150,10 @@ ebayAdapter:
   pollIntervalSeconds: 60
   env: production
   apiBaseUrl: "https://api.ebay.com"
+  dryRun: true
+  shopwareEbayTag: "ebay"
+  stateDbPath: "/data/state.db"
+  oauthScopes: "https://api.ebay.com/oauth/api_scope"
   # Credentials (stored in a Secret created by this chart)
   clientId: ""
   clientSecret: ""
