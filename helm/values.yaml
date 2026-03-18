@@ -138,6 +138,33 @@ startupJob:
   waitTimeout: 600
   waitImage: bitnami/kubectl:latest
 
+ebayAdapter:
+  enabled: false
+  replicaCount: 1
+  image:
+    # Built by CI: ghcr.io/<org-or-user>/ebay-adapter:<tag>
+    repository: ghcr.io/jodett/ebay-adapter
+    # Suggested: set to the CI tag (e.g. "sha-<shortsha>" or "latest")
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  pollIntervalSeconds: 60
+  env: production
+  apiBaseUrl: "https://api.ebay.com"
+  # Credentials (stored in a Secret created by this chart)
+  clientId: ""
+  clientSecret: ""
+  refreshToken: ""
+  # Optional: later for pushing into Shopware
+  shopwareAdminApiBaseUrl: ""
+  shopwareAdminApiToken: ""
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
 backup:
   mariadbDumpExample:
     enabled: false

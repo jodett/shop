@@ -61,3 +61,23 @@ helm upgrade --install shopware ./shopware-k3s-chart -n shop --create-namespace 
 2. Media-PVC später auf RWX umstellen, falls du mehrere App-Replikas willst.
 3. Backups separat ergänzen.
 4. eBay-Sync später als separates Chart oder Deployment hinzufügen.
+
+## eBay-Adapter (C# Worker) bauen & deployen
+
+### CI: Image bauen und nach GHCR pushen
+
+Dieses Repo enthält einen GitHub Actions Workflow (`.github/workflows/ebay-adapter-image.yml`), der bei Änderungen unter `ebay-adapter/` automatisch ein Multi-Arch Image baut und nach GHCR pusht:
+
+- `ghcr.io/<owner>/ebay-adapter:latest` (default branch)
+- `ghcr.io/<owner>/ebay-adapter:sha-<shortsha>`
+
+### Helm: Adapter aktivieren
+
+Setze die Image-Referenz und aktivere das Deployment:
+
+```bash
+helm upgrade --install shop ./helm -n <namespace> --create-namespace \
+  --set ebayAdapter.enabled=true \
+  --set ebayAdapter.image.repository=ghcr.io/<owner>/ebay-adapter \
+  --set ebayAdapter.image.tag=latest
+```

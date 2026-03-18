@@ -1,0 +1,61 @@
+{{- if .Values.ebayAdapter.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "shopware-k3s.fullname" . }}-ebay-adapter
+  labels:
+    {{- include "shopware-k3s.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ebay-adapter
+spec:
+  replicas: {{ .Values.ebayAdapter.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "shopware-k3s.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: ebay-adapter
+  template:
+    metadata:
+      labels:
+        {{- include "shopware-k3s.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: ebay-adapter
+    spec:
+      serviceAccountName: {{ include "shopware-k3s.serviceAccountName" . }}
+      {{- if .Values.startupJob.enabled }}
+      initContainers:
+        - name: wait-for-startup
+          image: {{ .Values.startupJob.waitImage | quote }}
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for startup job {{ include "shopware-k3s.fullname" . }}-startup..."
+              kubectl wait --for=condition=complete job/{{ include "shopware-k3s.fullname" . }}-startup -n {{ .Release.Namespace }} --timeout={{ .Values.startupJob.waitTimeout }}s
+              echo "Startup job completed."
+      {{- end }}
+      containers:
+        - name: ebay-adapter
+          image: "{{ .Values.ebayAdapter.image.repository }}:{{ .Values.ebayAdapter.image.tag }}"
+          imagePullPolicy: {{ .Values.ebayAdapter.image.pullPolicy }}
+          env:
+            - name: EBAY_ENVIRONMENT
+              value: {{ .Values.ebayAdapter.env | quote }}
+            - name: EBAY_API_BASE_URL
+              value: {{ .Values.ebayAdapter.apiBaseUrl | quote }}
+            - name: EBAY_POLL_INTERVAL_SECONDS
+              value: {{ .Values.ebayAdapter.pollIntervalSeconds | quote }}
+            {{- if .Values.ebayAdapter.shopwareAdminApiBaseUrl }}
+            - name: SHOPWARE_ADMIN_API_BASE_URL
+              value: {{ .Values.ebayAdapter.shopwareAdminApiBaseUrl | quote }}
+            {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ include "shopware-k3s.fullname" . }}-ebay-adapter
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          resources:
+            {{- toYaml .Values.ebayAdapter.resources | nindent 12 }}
+{{- end }}
+
