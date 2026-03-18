@@ -1,0 +1,15 @@
+Z:\shop\ebay-adapter\bin\Release\net8.0\ebay-adapter.exe
+Z:\shop\ebay-adapter\bin\Release\net8.0\ebay-adapter.deps.json
+Z:\shop\ebay-adapter\bin\Release\net8.0\ebay-adapter.runtimeconfig.json
+Z:\shop\ebay-adapter\bin\Release\net8.0\ebay-adapter.dll
+Z:\shop\ebay-adapter\bin\Release\net8.0\ebay-adapter.pdb
+Z:\shop\ebay-adapter\obj\Release\net8.0\ebay-adapter.GeneratedMSBuildEditorConfig.editorconfig
+Z:\shop\ebay-adapter\obj\Release\net8.0\ebay-adapter.AssemblyInfoInputs.cache
+Z:\shop\ebay-adapter\obj\Release\net8.0\ebay-adapter.AssemblyInfo.cs
+Z:\shop\ebay-adapter\obj\Release\net8.0\ebay-adapter.csproj.CoreCompileInputs.cache
+Z:\shop\ebay-adapter\obj\Release\net8.0\ebay-adapter.sourcelink.json
+Z:\shop\ebay-adapter\obj\Release\net8.0\ebay-adapter.dll
+Z:\shop\ebay-adapter\obj\Release\net8.0\refint\ebay-adapter.dll
+Z:\shop\ebay-adapter\obj\Release\net8.0\ebay-adapter.pdb
+Z:\shop\ebay-adapter\obj\Release\net8.0\ebay-adapter.genruntimeconfig.cache
+Z:\shop\ebay-adapter\obj\Release\net8.0\ref\ebay-adapter.dll
