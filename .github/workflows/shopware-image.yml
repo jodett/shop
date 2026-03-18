@@ -1,13 +1,14 @@
-name: Build & push ebay-adapter image
+name: Build & push shopware image
 
 on:
   push:
     branches: ["main", "master"]
     paths:
-      - "ebay-adapter/**"
+      - "Dockerfile"
+      # If you later add build context files outside Dockerfile, extend this list.
   pull_request:
     paths:
-      - "ebay-adapter/**"
+      - "Dockerfile"
   workflow_dispatch: {}
 
 permissions:
@@ -16,7 +17,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/ebay-adapter
+  IMAGE_NAME: ${{ github.repository_owner }}/shopware
 
 jobs:
   build:
@@ -66,7 +67,7 @@ jobs:
         run: |
           set -euo pipefail
           git fetch --tags --force
-          prev_tag="$(git describe --tags --match 'ebay-adapter-v*' --abbrev=0 2>/dev/null || true)"
+          prev_tag="$(git describe --tags --match 'shopware-v*' --abbrev=0 2>/dev/null || true)"
           echo "prev_tag=$prev_tag"
 
           npm install --no-save \
@@ -75,14 +76,14 @@ jobs:
             @semantic-release/release-notes-generator@13 \
             @semantic-release/github@11
 
-          npx semantic-release -e .releaserc.ebay-adapter.json || true
+          npx semantic-release -e .releaserc.shopware.json || true
 
           git fetch --tags --force
-          new_tag="$(git describe --tags --match 'ebay-adapter-v*' --abbrev=0 2>/dev/null || true)"
+          new_tag="$(git describe --tags --match 'shopware-v*' --abbrev=0 2>/dev/null || true)"
           echo "new_tag=$new_tag"
 
           if [ -n "$new_tag" ] && [ "$new_tag" != "$prev_tag" ]; then
-            version="${new_tag#ebay-adapter-v}"
+            version="${new_tag#shopware-v}"
             echo "released_version=$version" >> "$GITHUB_OUTPUT"
           fi
 
@@ -92,9 +93,9 @@ jobs:
         run: |
           set -euo pipefail
           git fetch --tags --force
-          tag="$(git tag --points-at HEAD | grep -E '^ebay-adapter-v[0-9]+\\.[0-9]+\\.[0-9]+' | head -n 1 || true)"
+          tag="$(git tag --points-at HEAD | grep -E '^shopware-v[0-9]+\\.[0-9]+\\.[0-9]+' | head -n 1 || true)"
           if [ -n "$tag" ]; then
-            echo "version=${tag#ebay-adapter-v}" >> "$GITHUB_OUTPUT"
+            echo "version=${tag#shopware-v}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Compute docker tag list
@@ -106,7 +107,7 @@ jobs:
           echo "${{ steps.meta.outputs.tags }}" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
 
-          # Prefer an explicit git tag (ebay-adapter-vX.Y.Z), then a semantic-release release version.
+          # Prefer an explicit git tag (shopware-vX.Y.Z), then a semantic-release release version.
           version="${{ steps.gittag.outputs.version || '' }}"
           if [ -z "$version" ]; then version="${{ steps.semrel.outputs.released_version || '' }}"; fi
 
@@ -118,8 +119,8 @@ jobs:
           # No release happened. Tag as "next potential version" with an alpha prerelease.
           # Example: 1.2.4-alpha.123.gabc1234
           last="0.0.0"
-          if tag="$(git describe --tags --match 'ebay-adapter-v*' --abbrev=0 2>/dev/null)"; then
-            last="${tag#ebay-adapter-v}"
+          if tag="$(git describe --tags --match 'shopware-v*' --abbrev=0 2>/dev/null)"; then
+            last="${tag#shopware-v}"
           fi
           IFS='.' read -r major minor patch <<< "$last"
           major="${major:-0}"; minor="${minor:-0}"; patch="${patch:-0}"
@@ -131,8 +132,8 @@ jobs:
       - name: Build (and push on main)
         uses: docker/build-push-action@v6
         with:
-          context: ./ebay-adapter
-          file: ./ebay-adapter/Dockerfile
+          context: .
+          file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |

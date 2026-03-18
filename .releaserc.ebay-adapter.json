@@ -1,0 +1,24 @@
+{
+  "branches": ["main", "master"],
+  "tagFormat": "ebay-adapter-v${version}",
+  "plugins": [
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "conventionalcommits",
+        "releaseRules": [
+          { "breaking": true, "scope": "ebay-adapter", "release": "major" },
+          { "type": "feat", "scope": "ebay-adapter", "release": "minor" },
+          { "type": "fix", "scope": "ebay-adapter", "release": "patch" },
+          { "type": "perf", "scope": "ebay-adapter", "release": "patch" }
+        ]
+      }
+    ],
+    [
+      "@semantic-release/release-notes-generator",
+      { "preset": "conventionalcommits" }
+    ],
+    "@semantic-release/github"
+  ]
+}
+

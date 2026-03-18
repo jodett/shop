@@ -1,0 +1,27 @@
+{
+  "branches": ["main", "master"],
+  "tagFormat": "shopware-v${version}",
+  "plugins": [
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "conventionalcommits",
+        "releaseRules": [
+          { "breaking": true, "scope": "shopware", "release": "major" },
+          { "breaking": true, "scope": "infra", "release": "major" },
+          { "type": "feat", "scope": "shopware", "release": "minor" },
+          { "type": "feat", "scope": "infra", "release": "minor" },
+          { "type": "fix", "scope": "shopware", "release": "patch" },
+          { "type": "fix", "scope": "infra", "release": "patch" },
+          { "type": "perf", "scope": "infra", "release": "patch" }
+        ]
+      }
+    ],
+    [
+      "@semantic-release/release-notes-generator",
+      { "preset": "conventionalcommits" }
+    ],
+    "@semantic-release/github"
+  ]
+}
+
